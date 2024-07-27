@@ -1,7 +1,7 @@
 import serial #install module pyserial (not serial)
 import mediapipe as mp
 import numpy as np
-import cv2 as cv
+import cv2 as cv #openCV - open computer vision
 import time
 import math
 
@@ -39,7 +39,7 @@ def countFinger(lmList: list[list], tipIds: dict, ser, led=False) -> int:
             if led:
                 connectArduinoLight(tipIds, list(tipIds.keys())[0], ser, mode=True)
         else:
-            fingers.append(0) #if finger open then append 0
+            fingers.append(0) #if finger closed then append 0
             if led:
                 connectArduinoLight(tipIds, list(tipIds.keys())[0], ser)
         # for other four fingers
@@ -118,8 +118,8 @@ video = cv.VideoCapture(0) #capture the camera and store it in a variable
 mpHand = mp.solutions.hands #create a hand object from mediapipe
 hands = mpHand.Hands(max_num_hands=1)  # specify no of hands
 mpDraw = mp.solutions.drawing_utils #specify that we want to draw the the connections on hand
-# ser = serial.Serial("COM6", 9600, timeout=1) #specify the serial post, baudrate, and retry interval
-ser=0 #comment this line and uncomment the above to connect through bluetooth
+ser = serial.Serial("COM6", 9600, timeout=1) #specify the serial post, baudrate, and retry interval
+# ser=1
 if __name__ == '__main__':
     """main function"""
 
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         results = hands.process(frameRGB) # Processes an RGB image and returns the hand landmarks of each detected hand
         frame = findHands(results) #draw lines on hand if hand is found
         lmList = findPosition(frame, results, draw=False) #return the position of each landmark
-        count = countFinger(lmList, tipIds, ser, led=False) #count the number of fingers
+        count = countFinger(lmList, tipIds, ser, led=True) #count the number of fingers
         fingerLength(lmList, frame, servo=False) #calculate the degree from distance between thumb and index finger
         cTime = time.time() #fetch the current system time
         fps = 1 // (cTime - pTime) #calculate fps
